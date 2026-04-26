@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I WILL. — FITFO Cigar Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0D0D0D;
+    --charcoal: #1A1A1A;
+    --cream: #E8DCC8;
+    --gold: #C5A55A;
+    --muted: #6B6055;
+    --mid: #3A3530;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--cream); font-family: 'Cormorant Garamond', Georgia, serif; cursor: crosshair; overflow-x: hidden; }
+  .side-nav { position: fixed; left: 40px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 24px; }
+  .side-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); cursor: pointer; transition: all 0.3s; position: relative; }
+  .side-dot.active { background: var(--gold); transform: scale(1.5); }
+  .side-dot:hover { background: var(--cream); }
+  .side-dot::after { content: attr(data-label); position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); white-space: nowrap; opacity: 0; transition: opacity 0.3s; }
+  .side-dot:hover::after { opacity: 1; }
+  .top-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 28px 60px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(13,13,13,0.95), transparent); }
+  .top-mark { font-size: 12px; letter-spacing: 0.2em; color: var(--cream); text-decoration: none; white-space: nowrap; }
+  .top-right { display: flex; gap: 40px; align-items: center; }
+  .top-nav-link { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.3s; }
+  .top-nav-link:hover { color: var(--cream); }
+  .s1 { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow-x: hidden; overflow-y: visible; padding: 100px 60px 140px; }
+  .s1-bg-text { position: absolute; font-size: clamp(200px, 30vw, 400px); font-weight: 300; color: rgba(197,165,90,0.04); letter-spacing: -0.05em; user-select: none; white-space: nowrap; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+  .s1-content { text-align: center; position: relative; z-index: 1; width: 100%; }
+  .s1-pre { font-size: 11px; letter-spacing: 0.6em; text-transform: uppercase; color: var(--gold); margin-bottom: 60px; opacity: 0; animation: appear 1s ease forwards 0.5s; }
+  .s1-title { font-size: clamp(100px, 20vw, 220px); font-weight: 300; line-height: 0.85; letter-spacing: -0.02em; opacity: 0; animation: appear 1.2s ease forwards 0.8s; }
+  .s1-title .line1 { display: block; color: var(--cream); }
+  .s1-title .line2 { display: block; color: var(--cream); }
+  .s1-title .period { color: var(--gold); }
+  .s1-mid { margin: 48px auto; display: flex; align-items: center; justify-content: center; gap: 24px; opacity: 0; animation: appear 1s ease forwards 1.2s; }
+  .s1-rule { width: 60px; height: 1px; background: var(--gold); }
+  .s1-sub { font-size: 13px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--muted); }
+  .s1-desc { font-size: clamp(16px, 2vw, 22px); font-weight: 300; font-style: italic; color: var(--muted); max-width: 600px; margin: 0 auto 60px; line-height: 1.8; opacity: 0; animation: appear 1s ease forwards 1.5s; }
+  .s1-actions { display: flex; gap: 20px; justify-content: center; opacity: 0; animation: appear 1s ease forwards 1.8s; flex-wrap: wrap; }
+  .btn-lg { display: inline-block; padding: 20px 60px; font-family: 'Cormorant Garamond', serif; font-size: 13px; letter-spacing: 0.35em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: all 0.4s; border: none; }
+  .btn-lg-solid { background: var(--gold); color: var(--black); }
+  .btn-lg-solid:hover { background: #D4B870; }
+  .btn-lg-outline { border: 1px solid var(--muted); color: var(--muted); background: transparent; }
+  .btn-lg-outline:hover { border-color: var(--cream); color: var(--cream); }
+  .scroll-hint { position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; opacity: 0; animation: appear 1s ease forwards 2.2s; z-index: 2; }
+  .scroll-hint span { font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted); }
+  .scroll-arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollDrop 1.5s ease-in-out infinite; }
+  .s2 { min-height: 100vh; display: flex; align-items: center; background: var(--charcoal); border-top: 1px solid var(--mid); border-bottom: 1px solid var(--mid); padding: 100px 120px; }
+  .s2-inner { max-width: 1000px; margin: 0 auto; width: 100%; }
+  .s2-label { font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin-bottom: 80px; display: flex; align-items: center; gap: 20px; }
+  .s2-label::after { content: ''; flex: 1; height: 1px; background: var(--mid); }
+  .manifesto-lines { display: flex; flex-direction: column; }
+  .m-line { font-size: clamp(32px, 5vw, 64px); font-weight: 300; line-height: 1.15; color: var(--cream); padding: 20px 0; border-bottom: 1px solid var(--mid); }
+  .m-line.italic { font-style: italic; color: var(--muted); font-size: clamp(22px, 3.5vw, 44px); }
+  .m-line.gold { color: var(--gold); }
+  .s3 { min-height: 100vh; display: grid; grid-template-columns: 55% 45%; }
+  .s3-left { background: var(--black); display: flex; align-items: center; justify-content: center; padding: 100px 80px; border-right: 1px solid var(--mid); }
+  .journal-3d { width: 280px; aspect-ratio: 5.5/8.5; background: #111; position: relative; box-shadow: -30px 30px 80px rgba(0,0,0,0.8), -60px 60px 120px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(197,165,90,0.15); transform: perspective(1000px) rotateY(8deg) rotateX(2deg); transition: transform 0.6s ease; }
+  .journal-3d:hover { transform: perspective(1000px) rotateY(2deg) rotateX(1deg); }
+  .journal-3d::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: linear-gradient(to right, rgba(197,165,90,0.2), transparent); }
+  .j3-title { font-size: 36px; font-weight: 300; letter-spacing: 0.06em; color: #E8DCC8; text-align: center; line-height: 1.1; }
+  .j3-rule { width: 36px; height: 1px; background: var(--gold); margin: 18px auto; }
+  .j3-vol { font-size: 9px; letter-spacing: 0.35em; color: #6B6055; font-style: italic; text-align: center; }
+  .j3-mark { position: absolute; bottom: 20px; font-size: 8px; letter-spacing: 0.45em; color: #4A4035; }
+  .s3-right { padding: 100px 80px; display: flex; flex-direction: column; justify-content: center; }
+  .s3-label { font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin-bottom: 40px; }
+  .s3-title { font-size: clamp(36px, 4vw, 56px); font-weight: 300; line-height: 1.15; color: var(--cream); margin-bottom: 32px; }
+  .s3-desc { font-size: 17px; font-weight: 300; font-style: italic; color: var(--muted); line-height: 1.9; margin-bottom: 52px; }
+  .feature-list { margin-bottom: 60px; }
+  .feature-row { display: flex; align-items: flex-start; gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--mid); }
+  .feature-icon { width: 24px; height: 1px; background: var(--gold); margin-top: 12px; flex-shrink: 0; }
+  .feature-text { font-size: 15px; color: var(--cream); line-height: 1.5; }
+  .feature-text em { display: block; font-size: 12px; color: var(--muted); font-style: normal; margin-top: 4px; letter-spacing: 0.05em; }
+  .s3-pricing { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .price-tag { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .price-num { font-size: 52px; font-weight: 300; color: var(--cream); line-height: 1; }
+  .s4 { padding: 140px 120px; background: var(--charcoal); border-top: 1px solid var(--mid); }
+  .s4-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 60px; margin-bottom: 80px; padding-bottom: 40px; border-bottom: 1px solid var(--mid); }
+  .s4-label { font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  .s4-title { font-size: clamp(48px, 7vw, 96px); font-weight: 300; color: var(--cream); line-height: 0.9; }
+  .s4-intro { font-size: 17px; font-weight: 300; font-style: italic; color: var(--muted); line-height: 1.9; max-width: 500px; align-self: flex-end; }
+  .s4-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--mid); margin-bottom: 1px; }
+  .s4-item { background: var(--charcoal); padding: 44px 36px; transition: background 0.3s; position: relative; overflow: hidden; }
+  .s4-item:hover { background: #222; }
+  .s4-item::before { content: attr(data-num); position: absolute; top: -10px; right: 16px; font-size: 80px; font-weight: 300; color: rgba(197,165,90,0.06); line-height: 1; user-select: none; }
+  .s4-num { font-size: 10px; letter-spacing: 0.4em; color: var(--gold); margin-bottom: 20px; }
+  .s4-name { font-size: 18px; font-weight: 300; color: var(--cream); margin-bottom: 10px; }
+  .s4-desc { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.7; }
+  .s4-footer { display: flex; justify-content: space-between; align-items: center; padding: 60px 0 0; border-top: 1px solid var(--mid); }
+  .s4-price-label { font-size: 11px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .s4-price-amount { font-size: 64px; font-weight: 300; color: var(--gold); line-height: 1; }
+  .s5 { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px 60px; position: relative; overflow: hidden; }
+  .s5::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(197,165,90,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(197,165,90,0.04) 0%, transparent 50%); pointer-events: none; }
+  .s5-label { font-size: 10px; letter-spacing: 0.6em; text-transform: uppercase; color: var(--gold); margin-bottom: 48px; }
+  .s5-title { font-size: clamp(40px, 7vw, 88px); font-weight: 300; line-height: 1.1; color: var(--cream); margin-bottom: 40px; letter-spacing: -0.01em; }
+  .s5-quote { font-size: clamp(18px, 2.5vw, 26px); font-style: italic; color: var(--muted); max-width: 700px; line-height: 1.8; margin-bottom: 24px; }
+  .s5-sig { font-size: 22px; font-style: italic; color: var(--gold); margin-bottom: 80px; }
+  .s5-actions { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  footer { padding: 40px 60px; border-top: 1px solid var(--mid); display: flex; justify-content: space-between; align-items: center; }
+  .footer-mark { font-size: 11px; letter-spacing: 0.45em; color: var(--muted); }
+  .footer-copy { font-size: 11px; color: var(--mid); }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--cream); }
+  @keyframes appear { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scrollDrop { 0% { opacity: 0; transform: translateY(-10px); } 50% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(10px); } }
+  @media (max-width: 900px) {
+    .side-nav { display: none; }
+    .top-bar { padding: 20px 24px; }
+    .s1 { padding: 100px 24px 140px; }
+    .s2 { padding: 80px 24px; }
+    .s3 { grid-template-columns: 1fr; }
+    .s3-left { padding: 80px 24px; }
+    .s3-right { padding: 60px 24px; }
+    .s4 { padding: 80px 24px; }
+    .s4-header { flex-direction: column; }
+    .s4-grid { grid-template-columns: repeat(2, 1fr); }
+    .s4-footer { flex-direction: column; gap: 32px; align-items: flex-start; }
+    footer { flex-direction: column; gap: 20px; text-align: center; padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="top"></div>
+
+<div class="side-nav">
+  <div class="side-dot active" data-label="Home"></div>
+  <div class="side-dot" data-label="Philosophy"></div>
+  <div class="side-dot" data-label="Journal"></div>
+  <div class="side-dot" data-label="Gift Box"></div>
+  <div class="side-dot" data-label="Order"></div>
+</div>
+
+<div class="top-bar">
+  <a href="#top" class="top-mark">I &nbsp; W I L L .</a>
+  <div class="top-right">
+    <a href="#s2" class="top-nav-link">Philosophy</a>
+    <a href="#s3" class="top-nav-link">The Journal</a>
+    <a href="#s4" class="top-nav-link">Gift Box</a>
+  </div>
+</div>
+
+<section class="s1">
+  <div class="s1-bg-text">FITFO</div>
+  <div class="s1-content">
+    <p class="s1-pre">FITFO Cigar Journal &nbsp;·&nbsp; Volume I &nbsp;·&nbsp; First Edition 2026</p>
+    <h1 class="s1-title">
+      <span class="line1">I</span>
+      <span class="line2">WILL<span class="period">.</span></span>
+    </h1>
+    <div class="s1-mid">
+      <div class="s1-rule"></div>
+      <span class="s1-sub">The Foundation</span>
+      <div class="s1-rule"></div>
+    </div>
+    <p class="s1-desc">A luxury cigar journal for the man who smokes with intention — not performance. Forty entries. One season. The record of a standard being built.</p>
+    <div class="s1-actions">
+      <a href="#s5" class="btn-lg btn-lg-solid">Reserve the Gift Box — $145</a>
+      <a href="#s3" class="btn-lg btn-lg-outline">The Journal — $45</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<section class="s2" id="s2">
+  <div class="s2-inner">
+    <p class="s2-label">The Philosophy</p>
+    <div class="manifesto-lines">
+      <div class="m-line">There comes a point</div>
+      <div class="m-line italic">when excuses lose their value.</div>
+      <div class="m-line">The answers are incomplete.</div>
+      <div class="m-line italic">And still — it is yours to solve.</div>
+      <div class="m-line gold">That is the heart of FITFO.</div>
+    </div>
+  </div>
+</section>
+
+<section class="s3" id="s3">
+  <div class="s3-left">
+    <div class="journal-3d">
+      <div>
+        <div class="j3-title">Cigar<br>Journal</div>
+        <div class="j3-rule"></div>
+        <div class="j3-vol">Volume I &nbsp;·&nbsp; The Foundation</div>
+      </div>
+      <div class="j3-mark">I &nbsp; W I L L .</div>
+    </div>
+  </div>
+  <div class="s3-right">
+    <p class="s3-label">The Journal</p>
+    <h2 class="s3-title">A Record of Practice.<br>Not a Trophy Case.</h2>
+    <p class="s3-desc">A knowledge section built for the man who pays attention. 108 pages. 40 cigar entries. Three milestone sessions. Because the man who records what he notices becomes the man who knows what he wants.</p>
+    <div class="feature-list">
+      <div class="feature-row">
+        <div class="feature-icon"></div>
+        <div class="feature-text">Complete Knowledge Section<em>Origins · Wrappers · Tasting Theory · Pairing</em></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"></div>
+        <div class="feature-text">40 Structured Cigar Log Entries<em>Performance · Flavor · Reflection · Verdict</em></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"></div>
+        <div class="feature-text">Three FITFO Milestone Sessions<em>After cigars 10, 20, and 30</em></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"></div>
+        <div class="feature-text">What You Have Built — Closing Ceremony<em>The accounting of a season</em></div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"></div>
+        <div class="feature-text">Volume I of a Five Volume Series<em>The Foundation · The Craft · The Connoisseur · The Standard · The Legacy</em></div>
+      </div>
+    </div>
+    <div class="s3-pricing">
+      <div class="price-block">
+        <p class="price-tag">Journal Only</p>
+        <p class="price-num">$45</p>
+      </div>
+      <a href="#s5" class="btn-lg btn-lg-solid" style="margin-top:20px;">Order Now</a>
+    </div>
+  </div>
+</section>
+
+<section class="s4" id="s4">
+  <div class="s4-header">
+    <div>
+      <p class="s4-label">Father's Day — Limited First Edition</p>
+      <h2 class="s4-title">The Complete<br>Gift Box</h2>
+    </div>
+    <p class="s4-intro">Every item chosen with one purpose — to support the ritual from the first cut to the final reflection. This is not a collection of things. It is a complete first session, curated for the man who deserves to begin well.</p>
+  </div>
+  <div class="s4-grid">
+    <div class="s4-item" data-num="01"><p class="s4-num">01</p><p class="s4-name">FITFO Cigar Journal</p><p class="s4-desc">Volume I — The Foundation. 108 pages of intentional practice.</p></div>
+    <div class="s4-item" data-num="02"><p class="s4-num">02</p><p class="s4-name">Guillotine Cutter</p><p class="s4-desc">Precision. Clean start. The ritual begins here.</p></div>
+    <div class="s4-item" data-num="03"><p class="s4-num">03</p><p class="s4-name">Torch Lighter</p><p class="s4-desc">Light patiently. The first minute shapes everything.</p></div>
+    <div class="s4-item" data-num="04"><p class="s4-num">04</p><p class="s4-name">Single Cigar Ashtray</p><p class="s4-desc">One session. One place to let it rest.</p></div>
+    <div class="s4-item" data-num="05"><p class="s4-num">05</p><p class="s4-name">Travel Case — 2 Pack</p><p class="s4-desc">The ritual travels with you. Protect what you carry.</p></div>
+    <div class="s4-item" data-num="06"><p class="s4-num">06</p><p class="s4-name">Brass Pen — I WILL.</p><p class="s4-desc">Engraved. Weighted. Worthy of the pages it fills.</p></div>
+    <div class="s4-item" data-num="07"><p class="s4-num">07</p><p class="s4-name">Boveda Humidity Packs</p><p class="s4-desc">Keep what you carry in proper condition.</p></div>
+    <div class="s4-item" data-num="08"><p class="s4-num">08</p><p class="s4-name">Cedar Spills</p><p class="s4-desc">The traditional light. Slow, intentional, correct.</p></div>
+  </div>
+  <div class="s4-footer">
+    <div>
+      <p class="s4-price-label">The Complete Kit</p>
+      <p class="s4-price-amount">$145</p>
+    </div>
+    <a href="#s5" class="btn-lg btn-lg-solid">Give the Gift Box</a>
+  </div>
+</section>
+
+<section class="s5" id="s5">
+  <p class="s5-label">Father's Day &nbsp;·&nbsp; June 15, 2026 &nbsp;·&nbsp; Limited First Edition</p>
+  <h2 class="s5-title">Give the man<br>you respect<br>something worthy<br>of him.</h2>
+  <p class="s5-quote">I built this for myself first. That much is honest. But I also built it knowing that one day, someone I love might hold it in their hands and understand something about the man I was trying to become.</p>
+  <p class="s5-sig">— W</p>
+  <div class="s5-actions">
+    <a href="#" class="btn-lg btn-lg-solid">Reserve the Gift Box — $145</a>
+    <a href="#s3" class="btn-lg btn-lg-outline">Journal Only — $45</a>
+  </div>
+</section>
+
+<footer>
+  <p class="footer-mark">I &nbsp; W I L L .</p>
+  <p class="footer-copy">© 2026 I Will LLC &nbsp;·&nbsp; Miami, Florida &nbsp;·&nbsp; First Edition</p>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Contact</a>
+    <a href="#">Privacy</a>
+  </div>
+</footer>
+
+</body>
+</html>
